@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from itertools import groupby
+from itertools import combinations_with_replacement,groupby,permutations
 
 
 class Die:
@@ -19,8 +19,8 @@ class Die:
         else:
             raise TypeError('Data type of array must be integer or string')
 
-        if len(self.faces) != len(np.unique(self.faces)):
-            raise ValueError('faces must have unique values')
+       # if len(self.faces) != len(np.unique(self.faces)):
+        #    raise ValueError('faces must have unique values')
         self.weights = [1.0 for i in faces]
         self.df = pd.DataFrame(data=self.weights, index=self.faces, columns=['weights'])
 
@@ -43,7 +43,7 @@ class Die:
 
     def current_state(self):
         ''' returns the current state of the die'''
-        return self.faces
+        return self.df
 
     def __str__(self):
         return self.faces
@@ -129,6 +129,10 @@ Returns an integer for the number of jackpots.					"""
         return jackpotCount
 
     def face_count_per_roll(self):
+        '''Computes how many times a given face is rolled in each event.
+           For example, if a roll of five dice has all sixes, then the counts for this roll would be   for the face value ‘6’ and   for the other faces.
+           Returns a data frame of results.
+           The data frame has an index of the roll number, face values as columns, and count values in the cells (i.e. it is in wide format)..'''
         df2=self.game.show_game_result(format='narrow')
         #print('resetting index')
         df2.reset_index()
@@ -136,10 +140,6 @@ Returns an integer for the number of jackpots.					"""
         #print(df2.groupby("rollnumber").count())
         return df2.pivot_table(index="rollnumber",columns="val",aggfunc='size',fill_value=0)
         #return self.game.show_game_result('narrow').reset_index().set_index("rollnumber").pivot_table(values="rollnumber",columns=["val"],aggfunc=np.sum)
-        '''Computes how many times a given face is rolled in each event.
-           For example, if a roll of five dice has all sixes, then the counts for this roll would be   for the face value ‘6’ and   for the other faces.
-           Returns a data frame of results.
-           The data frame has an index of the roll number, face values as columns, and count values in the cells (i.e. it is in wide format)..'''
 
     def combo_count(self):
         '''A combo count method.
@@ -147,13 +147,18 @@ Returns an integer for the number of jackpots.					"""
             Combinations are order-independent and may contain repetitions.
             Returns a data frame of results.
             The data frame should have an MultiIndex of distinct combinations and a column for the associated counts.'''
-
-        combo_copy=self.game.show_game_result().copy()
-        combo_copy= combo_copy.reset_index().set_index(combo_copy.columns.tolist())
-        print(combo_copy)
-        combo_copy=combo_copy.groupby(combo_copy.columns.tolist()).count()
-        #combo_copy.drop(['rollnumber'], axis=1)
-        print(combo_copy)
+        combo_copy = self.game.show_game_result().copy()
+        #print(combo_copy)
+        #print(combo_copy.values.tolist())
+        combinations=combinations_with_replacement(combo_copy.values.tolist(),1)
+        resultdf=pd.DataFrame(columns=['Combination','Count'],data=[])
+        for combo in combinations:
+            #print(combo[0])
+            values_series = pd.Series(combo[0], index=combo_copy.columns)
+            mask = combo_copy.apply(lambda row: all(row == values_series), axis=1)
+            row_values_count = mask.sum()
+            resultdf.loc[len(resultdf.index)]= {'Combination':combo[0],'Count':row_values_count}
+        return resultdf
 
     def permutation_count(self):
         '''An permutation count method.
@@ -161,6 +166,18 @@ Returns an integer for the number of jackpots.					"""
             Permutations are order-dependent and may contain repetitions.
             Returns a data frame of results.
             The data frame should have an MultiIndex of distinct permutations and a column for the associated counts'''
+        perm_copy = self.game.show_game_result().copy()
+        #print(perm_copy)
+        # print(combo_copy.values.tolist())
+        perms = permutations(perm_copy.values.tolist(), 1)
+        resultdf = pd.DataFrame(columns=['Permutation', 'Count'], data=[])
+        for perm in perms:
+            #print(perm)
+            values_series = pd.Series(perm[0], index=perm_copy.columns)
+            mask = perm_copy.apply(lambda row: all(row == values_series), axis=1)
+            row_values_count = mask.sum()
+            resultdf.loc[len(resultdf.index)] = {'Permutation': perm[0], 'Count': row_values_count}
+        return resultdf
 
 
 if __name__ == "__main__":
@@ -195,3 +212,5 @@ if __name__ == "__main__":
     print(analyzer.face_count_per_roll())
     print("checking unique combinations")
     print(analyzer.combo_count())
+    print("checking Permutations")
+    print(analyzer.permutation_count())

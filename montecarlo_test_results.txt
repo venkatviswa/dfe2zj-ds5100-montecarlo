@@ -1,0 +1,20 @@
+Testing started at 1:13 AM ...
+Launching pytest with arguments /Users/venkat.viswanathan/UVA/DS5100/Project/FinalProject/tests/montecarlo_test.py --no-header --no-summary -q in /Users/venkat.viswanathan/UVA/DS5100/Project/FinalProject/tests
+
+============================= test session starts ==============================
+collecting ... collected 12 items
+
+montecarlo_test.py::DieTestCase::test_change_weights PASSED              [  8%]
+montecarlo_test.py::DieTestCase::test_current_state PASSED               [ 16%]
+montecarlo_test.py::DieTestCase::test_init PASSED                        [ 25%]
+montecarlo_test.py::DieTestCase::test_roll_die PASSED                    [ 33%]
+montecarlo_test.py::GameTestCase::test_init PASSED                       [ 41%]
+montecarlo_test.py::GameTestCase::test_play PASSED                       [ 50%]
+montecarlo_test.py::GameTestCase::test_show_game_result PASSED           [ 58%]
+montecarlo_test.py::AnalyzerTestCase::test_combo_count PASSED            [ 66%]
+montecarlo_test.py::AnalyzerTestCase::test_face_count_per_roll PASSED    [ 75%]
+montecarlo_test.py::AnalyzerTestCase::test_init PASSED                   [ 83%]
+montecarlo_test.py::AnalyzerTestCase::test_jackpot PASSED                [ 91%]
+montecarlo_test.py::AnalyzerTestCase::test_permutation_count PASSED      [100%]
+
+============================== 12 passed in 0.21s ==============================

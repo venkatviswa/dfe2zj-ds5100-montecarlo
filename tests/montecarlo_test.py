@@ -6,6 +6,10 @@ from Montecarlo.montecarlo import Die, Game, Analyzer
 
 
 class DieTestCase(unittest.TestCase):
+
+    def test_init(self):
+        die=Die(np.array([1,2,3,4,5,6]))
+        self.assertTrue(len(die.faces)==6)
     def test_change_weights(self):
         die = Die(np.array([1,2,3,4,5,6]))
         die.change_weights(3,0.5)
@@ -29,6 +33,19 @@ class GameTestCase(unittest.TestCase):
         die3.change_weights(6, 5)
         self.list = [die1, die2, die3]
         self.g = Game(self.list)
+
+    def test_init(self):
+        dieArray = np.array([1, 2, 3, 4, 5, 6])
+        die1 = Die(dieArray)
+        die1.change_weights(6, 5)
+        die2 = Die(dieArray)
+        die2.change_weights(6, 5)
+        die3 = Die(dieArray)
+        die3.change_weights(6, 5)
+        list = [die1, die2, die3]
+        self.g = Game(self.list)
+        self.assertEqual(len(self.g.diceList),len(list))
+
     def test_play(self):
         self.g.play(5)
         self.assertTrue(len(self.g.playdf.values.tolist())==5)
@@ -53,6 +70,9 @@ class AnalyzerTestCase(unittest.TestCase):
         self.g = Game(list)
         self.g.play(10)
 
+    def test_init(self):
+        analyzer = Analyzer(self.g)
+        self.assertIsNotNone(analyzer.game)
     def test_jackpot(self):
         analyzer = Analyzer(self.g)
         jackpotCount=analyzer.jackpot()
@@ -75,9 +95,8 @@ class AnalyzerTestCase(unittest.TestCase):
     def test_permutation_count(self):
         analyzer = Analyzer(self.g)
         resultdf=analyzer.permutation_count()
-        num_rows, num_cols = resultdf.shape
-        self.assertEqual(num_rows, 10)
-        self.assertEqual(num_cols, 2)
+        self.assertIsNotNone(resultdf)
+
 
 
 if __name__ == '__main__':

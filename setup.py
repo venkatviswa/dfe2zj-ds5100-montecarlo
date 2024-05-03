@@ -1,9 +1,9 @@
 from setuptools import setup
-setup(name='booklover',
-      version='0.1',
-      description='Best book lover app',
-      url='https://github.com/venkatviswa/hw09repo',
+setup(name='montecarloapp',
+      version='1.0',
+      description='Montecarlo app',
+      url='https://github.com/venkatviswa/ds5100-final-project',
       author='Venkat',
       author_email='dfe2zj@virginia.edu',
       license='MIT',
-      packages=['hwpkg'])
+      packages=['montecarlo'])

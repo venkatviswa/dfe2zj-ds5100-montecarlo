@@ -25,16 +25,20 @@ class Die:
         self.df = pd.DataFrame(data=self.weights, index=self.faces, columns=['weights'])
 
     def change_weights(self, face, new_weight):
-        ''' method to change weights of one face to another '''
+        ''' method to change weights of one face to another
+            Output : Method does not return anything
+        '''
         if face not in self.faces:
             raise IndexError('face does not exist')
         try:
             self.df.loc[face, 'weights'] = float(new_weight)
         except ValueError:
             raise TypeError('new_weight must be a float')
+        return None
 
     def roll_die(self, times=1):
-        '''method to roll the dice n number of times and returns a list of outcomes '''
+        '''method to roll the dice n number of times and returns a list of outcomes
+        Output : Returns list of outcomes in list format '''
         #print(list(self.df.sample(n=times,weights=self.weights,replace=True)))
         outcomeList = self.df.sample(n=times, weights=self.weights, replace=True).index.tolist()
         #print('after rolling dice')
@@ -44,9 +48,6 @@ class Die:
     def current_state(self):
         ''' returns the current state of the die'''
         return self.df
-
-    def __str__(self):
-        return self.faces
 
 
 class Game:
@@ -65,7 +66,9 @@ as the column name), and the face rolled in that instance in each
 cell.'''
 
     def play(self, numtimes):
-        ''' takes an integer that indicates how many times dice should be rolled '''
+        ''' takes an integer that indicates how many times dice should be rolled
+            Output : does not return any value
+        '''
         columns = ['die' + str(i + 1) for i in range(len(self.diceList))]
         #print(columns)
         self.playdf = pd.DataFrame(columns=columns, index=[], data=[])
@@ -80,13 +83,15 @@ cell.'''
             for rollindex, outcome in enumerate(outcomelist):
                 #print('roll' + str(rollindex + 1), 'die' + str(dieindex + 1), outcome)
                 self.playdf.loc['roll' + str(rollindex + 1), 'die' + str(dieindex + 1)] = outcome
-
+        return None
     def show_game_result(self, format='wide'):
         """This method just returns a copy of the private play data frame to the user.
            Takes a parameter to return the data frame in narrow or wide form which defaults to wide form.
            The narrow form will have a MultiIndex, comprising the roll number and the die number (in that order),
            and a single column with the outcomes (i.e. the face rolled).
-          This method should raise a ValueError if the user passes an invalid option for narrow or wide"""
+          This method should raise a ValueError if the user passes an invalid option for narrow or wide
+          Output : Returns two types of dataframes based on need ( wide or narrow)
+        """
 
         if format == 'wide':
             return self.playdf
@@ -107,14 +112,16 @@ various descriptive statistical properties about it.'''
         return next(g, True) and not next(g, False)
 
     def __init__(self, game):
+        ''' initializes the Analyzer by passing a Game that was played recently to do analysis'''
         self.game = game
         if not isinstance(game, Game):
             raise ValueError('Not a game object')
 
     def jackpot(self):
         """A jackpot is a result in which all faces are the same, e.g. all ones
-for a six-sided die.Computes how many times the game resulted in a jackpot.
-Returns an integer for the number of jackpots.					"""
+            for a six-sided die.Computes how many times the game resulted in a jackpot.
+            Output :Returns an integer for the number of jackpots.
+        """
 
         gamedf = self.game.show_game_result(format='wide')
         jackpotCount=0
@@ -132,7 +139,9 @@ Returns an integer for the number of jackpots.					"""
         '''Computes how many times a given face is rolled in each event.
            For example, if a roll of five dice has all sixes, then the counts for this roll would be   for the face value ‘6’ and   for the other faces.
            Returns a data frame of results.
-           The data frame has an index of the roll number, face values as columns, and count values in the cells (i.e. it is in wide format)..'''
+           The data frame has an index of the roll number, face values as columns, and count values in the cells (i.e. it is in wide format)..
+           Output : Returns a data frame of results.
+        '''
         df2=self.game.show_game_result(format='narrow')
         #print('resetting index')
         df2.reset_index()
@@ -146,7 +155,9 @@ Returns an integer for the number of jackpots.					"""
             Computes the distinct combinations of faces rolled, along with their counts.
             Combinations are order-independent and may contain repetitions.
             Returns a data frame of results.
-            The data frame should have an MultiIndex of distinct combinations and a column for the associated counts.'''
+            The data frame should have an MultiIndex of distinct combinations and a column for the associated counts.
+            Output : Returns a data frame of results.
+        '''
         combo_copy = self.game.show_game_result().copy()
         #print(combo_copy)
         #print(combo_copy.values.tolist())
@@ -165,19 +176,10 @@ Returns an integer for the number of jackpots.					"""
             Computes the distinct permutations of faces rolled, along with their counts.
             Permutations are order-dependent and may contain repetitions.
             Returns a data frame of results.
-            The data frame should have an MultiIndex of distinct permutations and a column for the associated counts'''
+            The data frame should have an MultiIndex of distinct permutations and a column for the associated counts
+            Output : Returns a data frame of results.
+        '''
         perm_copy = self.game.show_game_result().copy()
-        #print(perm_copy)
-        # print(combo_copy.values.tolist())
-        #perms = permutations(perm_copy.values.tolist(), 1)
-        #resultdf = pd.DataFrame(columns=['Permutation', 'Count'], data=[])
-        #for perm in perms:
-            #print(perm)
-         #   values_series = pd.Series(perm[0], index=perm_copy.columns)
-         #   mask = perm_copy.apply(lambda row: all(row == values_series), axis=1)
-         #   row_values_count = mask.sum()
-         #   resultdf.loc[len(resultdf.index)] = {'Permutation': perm[0], 'Count': row_values_count}
-
         gameresult=self.game.show_game_result()
         gameresultkeys=gameresult.columns.tolist()
         resultdf = pd.DataFrame(self.game.show_game_result().value_counts(gameresultkeys).sort_index())

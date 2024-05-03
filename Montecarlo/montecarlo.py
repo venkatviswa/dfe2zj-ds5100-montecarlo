@@ -169,14 +169,18 @@ Returns an integer for the number of jackpots.					"""
         perm_copy = self.game.show_game_result().copy()
         #print(perm_copy)
         # print(combo_copy.values.tolist())
-        perms = permutations(perm_copy.values.tolist(), 1)
-        resultdf = pd.DataFrame(columns=['Permutation', 'Count'], data=[])
-        for perm in perms:
+        #perms = permutations(perm_copy.values.tolist(), 1)
+        #resultdf = pd.DataFrame(columns=['Permutation', 'Count'], data=[])
+        #for perm in perms:
             #print(perm)
-            values_series = pd.Series(perm[0], index=perm_copy.columns)
-            mask = perm_copy.apply(lambda row: all(row == values_series), axis=1)
-            row_values_count = mask.sum()
-            resultdf.loc[len(resultdf.index)] = {'Permutation': perm[0], 'Count': row_values_count}
+         #   values_series = pd.Series(perm[0], index=perm_copy.columns)
+         #   mask = perm_copy.apply(lambda row: all(row == values_series), axis=1)
+         #   row_values_count = mask.sum()
+         #   resultdf.loc[len(resultdf.index)] = {'Permutation': perm[0], 'Count': row_values_count}
+
+        gameresult=self.game.show_game_result()
+        gameresultkeys=gameresult.columns.tolist()
+        resultdf = pd.DataFrame(self.game.show_game_result().value_counts(gameresultkeys).sort_index())
         return resultdf
 
 
